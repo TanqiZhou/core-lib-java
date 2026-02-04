@@ -3,8 +3,9 @@ package io.apimatic.core.logger;
 import java.util.Map;
 
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.slf4j.event.Level;
-import org.slf4j.spi.LoggingEventBuilder;
+//import org.slf4j.spi.LoggingEventBuilder;
 
 public class Slf4jLogger implements io.apimatic.coreinterfaces.logger.Logger {
 
@@ -37,11 +38,27 @@ public class Slf4jLogger implements io.apimatic.coreinterfaces.logger.Logger {
      */
     @Override
     public void log(Level level, String format, Map<String, Object> arguments) {
-        LoggingEventBuilder builder = logger.atLevel(level);
-
-        for (Map.Entry<String, Object> entry : arguments.entrySet()) {
-            builder.addKeyValue(entry.getKey(), entry.getValue());
+        try {
+            for (Map.Entry<String, Object> entry : arguments.entrySet()) {
+                MDC.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+            Object[] args = arguments.values().toArray();
+            switch (level) {
+                case DEBUG:
+                    logger.debug(format, args);
+                    break;
+                case INFO:
+                    logger.info(format, args);
+                    break;
+                case WARN:
+                    logger.warn(format, args);
+                    break;
+                case ERROR:
+                    logger.error(format, args);
+                    break;
+            }
+        } finally {
+            MDC.clear();
         }
-        builder.log(format, arguments.values().toArray());
     }
 }

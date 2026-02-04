@@ -26,7 +26,8 @@ public class ConsoleLogger implements Logger {
      */
     @Override
     public void log(Level level, String format, Map<String, Object> arguments) {
+        //把上面的代码改成 slf4j1.7的写法
         System.out.printf("%s: %s%n", level,
-                MessageFormatter.basicArrayFormat(format, arguments.values().toArray()));
+                MessageFormatter.arrayFormat(format, arguments.values().toArray()));
     }
 }
